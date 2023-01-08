@@ -1,0 +1,1 @@
+export { CubeScene } from "./cube";
