@@ -20,7 +20,9 @@
       "@hooks/*": ["hooks/*"],
       "@scenes/*": ["scenes/*"],
       "@interfaces/*": ["interfaces/*"],
-      "@models/*": ["models/*"]
+      "@models/*": ["models/*"],
+      "@controls/*": ["controls/*"],
+      "@helpers/*": ["helpers/*"]
     }
   },
   "include": ["src"],

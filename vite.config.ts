@@ -13,6 +13,8 @@ export default defineConfig({
       "@scenes": resolve(src, "scenes"),
       "@interfaces": resolve(src, "interfaces"),
       "@models": resolve(src, "models"),
+      "@controls": resolve(src, "controls"),
+      "@helpers": resolve(src, "helpers"),
     },
   },
 });

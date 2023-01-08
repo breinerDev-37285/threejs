@@ -1,5 +1,7 @@
-import { useEffect, useRef } from "react";
+import ControlCube from "@controls/cube";
 import Cube from "@models/cube";
+import { rotateCube } from "@helpers/cube";
+import { useEffect, useRef } from "react";
 
 export const CubeScene = () => {
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -9,16 +11,20 @@ export const CubeScene = () => {
     const cube = new Cube(ref);
     cube.drawCube();
     cube.control();
-    cube.render(() => {
-      if (cube.Layer) {
-        cube.Layer.rotation.y += 0.009;
-        cube.Layer.rotation.x += 0.008;
-        cube.Layer.rotation.z += 0.001;
-      }
-    });
+    cube.render();
     cube.updateOnResize();
 
-    return () => cube.destroy();
+    if (!cube.Layer) return;
+    const controls = new ControlCube(cube?.Layer);
+    controls.controlPosition();
+    controls.controlScale();
+    controls.controlColor();
+    controls.controlRotation();
+
+    return () => {
+      cube.destroy();
+      controls.destroy();
+    };
   }, [sceneRef, Cube]);
 
   return (

@@ -5,7 +5,7 @@ import {
   WebGLRenderer,
   BoxGeometry,
   Mesh,
-  MeshNormalMaterial,
+  MeshBasicMaterial,
 } from "three";
 
 export default class Cube {
@@ -46,9 +46,10 @@ export default class Cube {
 
   public drawCube() {
     const geometry = new BoxGeometry(1, 1, 1);
-    const material = new MeshNormalMaterial({ flatShading: true });
+    const material = new MeshBasicMaterial({ wireframe: true });
     this.cube = new Mesh(geometry, material);
     this.camera.position.set(0, 0, -10);
+    this.cube.rotation.set(-0.285, 0.461, 0.02);
     this.controls?.update();
     this.scene.add(this.cube);
   }
