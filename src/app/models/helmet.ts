@@ -14,6 +14,12 @@ import {
   MeshStandardMaterial,
   CameraHelper,
   PCFSoftShadowMap,
+  ACESFilmicToneMapping,
+  NoToneMapping,
+  LinearToneMapping,
+  ReinhardToneMapping,
+  CineonToneMapping,
+  sRGBEncoding,
 } from "three";
 
 export default class Helmet extends MainScene {
@@ -54,7 +60,7 @@ export default class Helmet extends MainScene {
   }
 
   /**
-   * Control de escena
+   * Control orbital de escena
    */
 
   public control() {
@@ -139,7 +145,7 @@ export default class Helmet extends MainScene {
   }
 
   public directionalLight(drawHelper = false) {
-    const light = new DirectionalLight(0xffffff, 2);
+    const light = new DirectionalLight(0xab2020, 2);
     light.position.set(3, 10, 5);
     light.castShadow = true; // agrega una sombra a esta luz
     light.shadow.mapSize.set(1024, 1024); // tamaño de la sombra
@@ -199,7 +205,7 @@ export default class Helmet extends MainScene {
       .onChange((value) => {
         this.scene.traverse((child) => {
           /**
-           * Tambien se puede comprobar por la malla y el material
+           * También se puede comprobar por la malla y el material
            * if(child instanceof Mesh && child.material instanceof MeshStandardMaterial)
            */
           if (child instanceof Mesh) {
@@ -227,17 +233,61 @@ export default class Helmet extends MainScene {
     this.scene.add(plane);
   }
 
+  private renderShadow() {
+    this.renderer.shadowMap.enabled = true; //Habilita las sombras
+    this.renderer.shadowMap.type = PCFSoftShadowMap; //Tipo de sombra
+    this.renderer.physicallyCorrectLights = true; //Habilita las luces físicas
+  }
+
+  private toneMapping() {
+    /**
+     * Renderizado tono de colores
+     */
+
+    this.renderer.outputEncoding = sRGBEncoding; //Habilita el tono de colores sRGB
+
+    this.renderer.toneMapping = ACESFilmicToneMapping; //ACESFilmic
+    this.renderer.toneMappingExposure = 0.7; //Exposición
+
+    const tone = this.gui.addFolder("Tonos de color");
+    tone
+      .add(this.renderer, "toneMapping", {
+        "Sin tono": NoToneMapping,
+        Linear: LinearToneMapping,
+        Renhard: ReinhardToneMapping,
+        Cineon: CineonToneMapping,
+        ACESFilmic: ACESFilmicToneMapping,
+      })
+      .onChange((val) => {
+        this.renderer.toneMapping = Number(this.renderer.toneMapping);
+
+        /**
+         * Actualizar el material en cada cambio de tono
+         */
+        this.scene.traverse((child) => {
+          if (child instanceof Mesh) {
+            child.material.needsUpdate = true;
+          }
+        });
+      })
+      .name("tipo");
+
+    tone
+      .add(this.renderer, "toneMappingExposure")
+      .min(0)
+      .max(10)
+      .step(0.001)
+      .name("Exposición");
+  }
+
   /**
    * Renderer
    */
 
   public render() {
-    /**
-     * Renderizado de Sombras
-     */
-    this.renderer.shadowMap.enabled = true; //Habilita las sombras
-    this.renderer.shadowMap.type = PCFSoftShadowMap; //Tipo de sombra
-    this.renderer.physicallyCorrectLights = true; //Habilita las luces físicas
+    this.renderShadow();
+    this.toneMapping();
+
     const animate = () => {
       requestAnimationFrame(animate);
       this.controls?.update();
