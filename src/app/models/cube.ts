@@ -1,40 +1,24 @@
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import {
-  Scene,
-  PerspectiveCamera,
-  WebGLRenderer,
-  BoxGeometry,
-  Mesh,
-  MeshBasicMaterial,
-} from "three";
+import { PerspectiveCamera, BoxGeometry, Mesh, MeshBasicMaterial } from "three";
+import MainScene from "./scene";
 
-export default class Cube {
-  private readonly scene: Scene;
+export default class Cube extends MainScene {
   private readonly camera: PerspectiveCamera;
-  private readonly renderer: WebGLRenderer;
-  private readonly element: HTMLElement;
   private cube?: Mesh;
   private controls?: OrbitControls;
 
   constructor(ref: HTMLElement) {
-    this.element = ref;
-    this.scene = new Scene();
+    super(ref);
+
     this.camera = new PerspectiveCamera(
       25,
       this.element.clientWidth / this.element.clientHeight,
       0.1,
       1000
     );
-    this.renderer = new WebGLRenderer();
-    this.renderer.setSize(this.element.clientWidth, this.element.clientHeight);
-    this.element.appendChild(this.renderer.domElement);
+
     this.cube = undefined;
     this.controls = undefined;
-  }
-
-  public destroy() {
-    this.scene.remove();
-    this.element.removeChild(this.renderer.domElement);
   }
 
   public control() {
@@ -74,6 +58,11 @@ export default class Cube {
       this.camera.updateProjectionMatrix();
     };
     window.addEventListener("resize", resize);
+  }
+
+  public destroy() {
+    this.scene.remove();
+    this.element.removeChild(this.renderer.domElement);
   }
 
   get Layer() {

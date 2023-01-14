@@ -1,11 +1,5 @@
-import { CubeScene } from "@scenes/index";
+import Router from "@router";
 
-const App = () => {
-  return (
-    <div>
-      <CubeScene />
-    </div>
-  );
-};
+const App = () => <Router />;
 
 export default App;

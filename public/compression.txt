@@ -1,0 +1,3 @@
+# compresion a draco 
+
+gltf-pipeline -i scene.gltf -o helmet.gltf --draco-compression-level=10

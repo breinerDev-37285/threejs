@@ -15,14 +15,15 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": "./src/app/",
+    "baseUrl": "./",
     "paths": {
-      "@hooks/*": ["hooks/*"],
-      "@scenes/*": ["scenes/*"],
-      "@interfaces/*": ["interfaces/*"],
-      "@models/*": ["models/*"],
-      "@controls/*": ["controls/*"],
-      "@helpers/*": ["helpers/*"]
+      "@hooks/*": ["src/app/hooks/*"],
+      "@interfaces/*": ["src/app/interfaces/*"],
+      "@models/*": ["src/app/models/*"],
+      "@controls/*": ["src/app/controls/*"],
+      "@helpers/*": ["src/app/helpers/*"],
+      "@router": ["src/app/router/index"],
+      "@components/*": ["src/app/components/*"]
     }
   },
   "include": ["src"],

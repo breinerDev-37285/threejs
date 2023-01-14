@@ -10,11 +10,12 @@ export default defineConfig({
   resolve: {
     alias: {
       "@hooks": resolve(src, "hooks"),
-      "@scenes": resolve(src, "scenes"),
       "@interfaces": resolve(src, "interfaces"),
       "@models": resolve(src, "models"),
       "@controls": resolve(src, "controls"),
       "@helpers": resolve(src, "helpers"),
+      "@router": resolve(src, "router"),
+      "@components": resolve(src, "components"),
     },
   },
 });
