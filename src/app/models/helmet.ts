@@ -1,6 +1,8 @@
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import MainScene from "./scene";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { GUI } from "dat.gui";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import {
   PerspectiveCamera,
   AmbientLight,
@@ -8,9 +10,11 @@ import {
   LoadingManager,
   CubeTextureLoader,
   Mesh,
+  PlaneGeometry,
+  MeshStandardMaterial,
+  CameraHelper,
+  PCFSoftShadowMap,
 } from "three";
-import MainScene from "./scene";
-import { GUI } from "dat.gui";
 
 export default class Helmet extends MainScene {
   private readonly camera: PerspectiveCamera;
@@ -73,6 +77,7 @@ export default class Helmet extends MainScene {
 
   public loadModel() {
     this.loadBaseModel("./space_helmet/scene.gltf", (gltf) => {
+      gltf.castShadow = true;
       this.scene.add(gltf.scene);
       this.camera.position.set(0, 0, -8);
       this.controls?.update();
@@ -87,9 +92,19 @@ export default class Helmet extends MainScene {
     const loader = this.loadBaseModel(
       "./space_helmet/draco/helmet.gltf",
       (gltf) => {
+        gltf.scene.rotation.y = Math.PI * 3;
         this.scene.add(gltf.scene);
-        this.camera.position.set(0, 0, -8);
+        this.camera.position.set(10, 7, -8);
         this.controls?.update();
+
+        /**
+         * Aplica sombra a todas las mallas
+         */
+        this.scene.traverse((child) => {
+          if (child instanceof Mesh) {
+            child.castShadow = true;
+          }
+        });
       }
     );
     loader.setDRACOLoader(this.dracoLoader);
@@ -114,11 +129,25 @@ export default class Helmet extends MainScene {
    * Lights
    */
 
-  public directionalLight() {
-    const light = new DirectionalLight(0xffffff, 1);
-    light.position.set(5, 5, 5);
+  private drawHelperLight(light: any) {
+    /** Dibuja lineas guias
+     * para ver el area que proyecta la luz
+     */
+    light.shadow.camera.zoom = 2;
+    const helper = new CameraHelper(light.shadow.camera);
+    this.scene.add(helper);
+  }
+
+  public directionalLight(drawHelper = false) {
+    const light = new DirectionalLight(0xffffff, 2);
+    light.position.set(3, 10, 5);
     light.castShadow = true; // agrega una sombra a esta luz
+    light.shadow.mapSize.set(1024, 1024); // tamaño de la sombra
+    light.shadow.bias = 0.005; // ajusta la sombra
+    light.shadow.normalBias = 0.005; // ajusta la sombra
     this.scene.add(light);
+
+    if (drawHelper) this.drawHelperLight(light);
 
     this.lightsFolder
       ?.add(light, "intensity")
@@ -129,13 +158,13 @@ export default class Helmet extends MainScene {
   }
 
   public ambientLight() {
-    const light = new AmbientLight(0xffffff, 1);
+    const light = new AmbientLight(0xffffff, 0.706);
     this.scene.add(light);
 
     this.lightsFolder
       ?.add(light, "intensity")
-      .min(0.5)
-      .max(10)
+      .min(0)
+      .max(1)
       .step(0.001)
       .name("Ambient");
   }
@@ -181,11 +210,34 @@ export default class Helmet extends MainScene {
   }
 
   /**
+   * Planos y sombras
+   * (Para habilitar las sombras se debe habilitar en el render y en la luz)
+   * se recomienda que la sombra sola se aplique a una luz especifica y no a todas
+   */
+
+  public plane() {
+    const geometry = new PlaneGeometry(10, 10);
+    const material = new MeshStandardMaterial({ color: 0xffffff });
+    const plane = new Mesh(geometry, material);
+
+    plane.rotation.x = Math.PI * -0.5;
+    plane.position.y = -1.3;
+    plane.receiveShadow = true;
+
+    this.scene.add(plane);
+  }
+
+  /**
    * Renderer
    */
 
   public render() {
+    /**
+     * Renderizado de Sombras
+     */
     this.renderer.shadowMap.enabled = true; //Habilita las sombras
+    this.renderer.shadowMap.type = PCFSoftShadowMap; //Tipo de sombra
+    this.renderer.physicallyCorrectLights = true; //Habilita las luces físicas
     const animate = () => {
       requestAnimationFrame(animate);
       this.controls?.update();

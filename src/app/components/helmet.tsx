@@ -8,14 +8,16 @@ export const SpacialHelmet = () => {
     if (!element) return;
 
     const helmet = Helmet.init(element);
-    helmet.loadDracoModel();
+
     helmet.control();
     helmet.render();
     helmet.updateOnResize();
-    helmet.directionalLight();
+    helmet.directionalLight(false);
     helmet.ambientLight();
     helmet.hdriLight();
     helmet.loadingManager();
+    helmet.plane();
+    helmet.loadDracoModel();
 
     return () => {
       helmet.destroy();

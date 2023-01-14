@@ -25,6 +25,5 @@ export default abstract class MainScene {
     return this.element;
   }
 
-
   public abstract render(): void;
 }
